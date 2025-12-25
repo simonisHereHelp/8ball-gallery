@@ -1,7 +1,7 @@
 // app/api/load-gallert/[[...slug]]/route.ts
 import { google } from "googleapis";
 import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type RouteContext = {
   params: { slug?: string[] };
@@ -15,8 +15,8 @@ const MIME_MAP: Record<string, string> = {
   gif: "image/gif",
 };
 
-export async function GET(request: Request, { params }: RouteContext) {
-  const session = await auth();
+export async function GET(request: NextRequest, { params }: { params: { slug?: string[] } }) {
+   const session = await auth();
   if (!session?.accessToken) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
