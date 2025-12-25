@@ -1,7 +1,12 @@
-// app/api/drive/files/route.ts
+// app/api/load-gallert/[[...slug]]/route.ts
 import { google } from "googleapis";
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+
+type RouteContext = {
+  params: { slug?: string[] };
+};
+
 
 const MIME_MAP: Record<string, string> = {
   jpg: "image/jpeg",
@@ -10,12 +15,12 @@ const MIME_MAP: Record<string, string> = {
   gif: "image/gif",
 };
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: RouteContext) {
   const session = await auth();
   if (!session?.accessToken) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
-  const type = searchParams.get("type")?.toLowerCase();
+  const type = (params.slug?.[0] || searchParams.get("type") || "").toLowerCase();
   const pageToken = searchParams.get("pageToken") || undefined;
 
   const oauth2Client = new google.auth.OAuth2();
@@ -30,7 +35,7 @@ export async function GET(request: Request) {
     q += ` and mimeType = '${mimeType}'`;
   } else {
     // Default image filter
-    q += ` and (mimeType = 'image/jpeg' or mimeType = 'image/png' or mimeType = 'image/gif')`;
+    q += " and (mimeType = 'image/jpeg' or mimeType = 'image/png' or mimeType = 'image/gif')";
   }
 
   try {
@@ -46,7 +51,8 @@ export async function GET(request: Request) {
       items: response.data.files || [],
       nextPageToken: response.data.nextPageToken || null,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

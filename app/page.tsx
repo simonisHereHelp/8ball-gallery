@@ -1,65 +1,74 @@
-import Image from "next/image";
+//app/page.tsx
+
+"use client";
+
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/gallery");
+    }
+  }, [router, status]);
+
+  const handleSignIn = () => {
+    signIn("google", { callbackUrl: "/gallery" });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    log in 
+    and 
+    display gallery
+    </div>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      <div className="max-w-3xl w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-2xl p-10 text-center space-y-6">
+        <div className="space-y-2">
+          <p className="text-sm uppercase tracking-[0.35em] text-blue-200">8Ball Gallery</p>
+          <h1 className="text-3xl sm:text-4xl font-semibold">Sign in to view your Drive photos</h1>
+          <p className="text-white/80 max-w-2xl mx-auto">
+            Connect with Google to launch NextAuth and browse the gallery pulled directly from your Drive folder.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <button
+            onClick={handleSignIn}
+            disabled={status === "loading"}
+            className="inline-flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-400 text-white font-medium shadow-lg shadow-blue-500/30 transition disabled:opacity-60"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden
+            >
+              <path
+                fill="currentColor"
+                d="M21.6 12.23c0-.63-.06-1.24-.17-1.83H12v3.47h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.23c1.9-1.75 2.99-4.33 2.99-7.17"
+              />
+              <path
+                fill="currentColor"
+                d="M12 22c2.7 0 4.96-.89 6.61-2.4l-3.23-2.5c-.9.6-2.06.96-3.38.96-2.6 0-4.8-1.76-5.59-4.14H3.05v2.6A9.99 9.99 0 0 0 12 22"
+              />
+              <path
+                fill="currentColor"
+                d="M6.41 13.92A5.98 5.98 0 0 1 6.1 12c0-.66.11-1.3.3-1.92V7.48H3.05A9.99 9.99 0 0 0 2 12c0 1.62.39 3.16 1.05 4.52l3.36-2.6"
+              />
+              <path
+                fill="currentColor"
+                d="M12 6.01c1.47 0 2.78.5 3.81 1.48l2.86-2.85C16.96 2.83 14.7 2 12 2A9.99 9.99 0 0 0 3.05 7.48l3.35 2.6C7.2 7.78 9.4 6 12 6"
+              />
+            </svg>
+            {status === "loading" ? "Preparing..." : "Continue with Google"}
+          </button>
+          <p className="text-sm text-white/70">We&apos;ll redirect you to the gallery once signed in.</p>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -1,6 +1,8 @@
 // auth.ts
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import type { Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 const {
   handlers,
@@ -29,16 +31,21 @@ const {
 
   callbacks: {
     async jwt({ token, account }) {
+         const enrichedToken = token as JWT & { accessToken?: string };
       // On first login, grab provider access token
       if (account?.access_token) {
-        token.accessToken = account.access_token;
+        enrichedToken.accessToken= account.access_token;
       }
-      return token;
+      return enrichedToken;
     },
     async session({ session, token }) {
+      const enrichedSession = session as Session & { accessToken?: string };
+      const enrichedToken = token as JWT & { accessToken?: string };
       // Expose accessToken to the client + server
-      (session as any).accessToken = token.accessToken;
-      return session;
+      if (enrichedToken.accessToken) {
+        enrichedSession.accessToken = enrichedToken.accessToken;
+      }
+      return enrichedSession;
     },
   },
 });
