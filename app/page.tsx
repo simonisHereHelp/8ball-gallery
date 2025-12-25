@@ -21,10 +21,6 @@ export default function Home() {
   };
 
   return (
-    log in 
-    and 
-    display gallery
-    </div>
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
       <div className="max-w-3xl w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-2xl p-10 text-center space-y-6">
         <div className="space-y-2">
